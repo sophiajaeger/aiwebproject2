@@ -7,6 +7,7 @@ start_url = prefix+'index.html'
 
 agenda = [start_url]
 crawled_pages = []
+global results 
 results = {}
 
 while agenda:
@@ -24,11 +25,36 @@ while agenda:
                 results[word.lower()] = [url]
         for anchor in soup.find_all('a'):
             # to do: only use page links that are on the prefix server
-            if ('www.' or 'http') not in str(anchor):
+            href = anchor.get('href')
+            print('href type', type(href), href)
+            found_url = '' 
+            if prefix in href:
+                found_url = href
+            elif 'www' not in href and 'http' not in href:
+                found_url = prefix + href
+            if len(found_url)!=0 and found_url not in crawled_pages and found_url not in agenda:
+                agenda.append(found_url)
+
+            """
+            found_link = anchor.get('href')
+            if prefix in anchor:
+                if found_link not in crawled_pages:
+                    agenda.append(found_link) # test if there yet?
+            elif ('www.' or 'http') not in str(anchor):
                 found_url = prefix+anchor.get('href') 
                 if found_url not in crawled_pages:
-                    agenda.append(found_url) 
+                    agenda.append(found_url) """
 
+def search(word_list):
+    """
+    Parameter: list (of word, all in lowercase letters)
+    Return: list
+    Takes a list of words and searches the results dictionary for the urls containing the words
+    """
+    urls = []
+    for word in word_list:
+        if word in results.keys():
+            urls
 
 print(results['the'])
     
