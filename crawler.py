@@ -1,16 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from whoosh.fields import Schema, TEXT, ID
-from whoosh.index import create_in, open_dir
-import os
+from collections import defaultdict
 
-# Define the schema for the Whoosh index
-schema = Schema(
-    url=ID(stored=True, unique=True),  # Store URLs (unique identifier)
-    title=TEXT(stored=True),  # Store and index titles
-    content=TEXT,  # Index full text content (not stored to save space)
-    teaser=TEXT(stored=True)  # Store the teaser for display
-)
 
 prefix = 'https://vm009.rz.uos.de/crawl/'
 

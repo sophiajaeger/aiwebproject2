@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Metatata for the webside-->
+    <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
+    <title>Search Results</title> <!-- title displayed in the browser tab -->
+</head>
+<body>
+    <!-- main content(all you can see): -->
+    <h1>Search Results</h1> <!-- heading for the results page -->
+
+    {% if results %}
+        <ul>
+        <!-- iterate over each result in the results list -->
+        {% for result in results %}
+            <li>
+                <!-- link to the found URL + opens in a new tab -->
+                <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+                <!-- display the teaser -->
+                <p>{{ result.teaser }}</p>
+                <!-- show how many times the words were found on the page -->
+                <small>Found {{ result.count }} times</small>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <!--if not found display:-->
+        <p>Word(s) not found.</p>
+    {% endif %}
+
+    <!--link to go back to the search engine-->
+    <a href="/">Back to Search</a>
+</body>
+</html>
