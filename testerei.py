@@ -3,14 +3,16 @@ import requests
 from bs4 import BeautifulSoup
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, ID, TEXT
-from whoosh import qparser
+from whoosh import qparser, analysis
 
+
+ana = analysis.StandardAnalyzer(stoplist=None, minsize=1)
 # Define Whoosh schema
 schema = Schema(
     url=ID(stored=True, unique=True),
-    title=TEXT(stored=True),
-    content=TEXT(stored=True),
-    teaser=TEXT(stored=True)
+    title=TEXT(stored=True, analyzer=ana),
+    content=TEXT(stored=True, analyzer=ana),
+    teaser=TEXT(stored=True, analyzer=ana)
 )
 
 # Index directory setup
