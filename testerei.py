@@ -9,16 +9,16 @@ from whoosh import qparser
 schema = Schema(
     url=ID(stored=True, unique=True),
     title=TEXT(stored=True),
-    content=TEXT,
+    content=TEXT(stored=True),
     teaser=TEXT(stored=True)
 )
 
 # Index directory setup
-if not os.path.exists("indexdir"):
-    os.mkdir("indexdir")
-    ix = create_in("indexdir", schema)  # Create index if it doesn't exist
-else:
-    ix = open_dir("indexdir")  # Open existing index
+#if not os.path.exists("indexdir"):
+os.mkdir("indexdir")
+ix = create_in("indexdir", schema)  # Create index if it doesn't exist
+#:
+ix = open_dir("indexdir")  # Open existing index
 
 # Crawler settings
 prefix = 'https://vm009.rz.uos.de/crawl/'
@@ -85,21 +85,21 @@ def search(query_str):
     """
     print("searching for", query_str)
     with ix.searcher() as searcher:
-        
+        '''
         print("Indexed Documents:")
         for docnum in range(searcher.doc_count()):
             stored_fields = searcher.stored_fields(docnum)
             print(f"Document {docnum}: {stored_fields}")
-        
+        '''
         parser = qparser.QueryParser("content", ix.schema)
         query = parser.parse(query_str)
         #nächste zeile nur zum testen 
         print(f"Parsed Query: {query}")
         results = searcher.search(query)
-        for r in results:
-            print("bin da")
-            print(url)
-            if url not in search_results:
+        for result in results:
+            #print("bin da")
+            #print(url)
+            '''if url not in search_results:
                 print("bin hier")
                 search_results.append({
                             "url":url,
@@ -107,18 +107,25 @@ def search(query_str):
                             "teaser":page_teaser
                             #count
                         })
-            '''print("still searching")
+            print("still searching")
             print(f"Title: {r['title']}")
             print(f"URL: {r['url']}")
             print(f"Teaser: {r['teaser']}")
             print("----------")'''
+            search_results.append({
+                            "url": result["url"],
+                            "title": result["title"],
+                            "teaser": result["teaser"],
+                            "count": result.highlights("content").count(query_str)
+            })
                 
-            return search_results
-        print(search_results)
+    return search_results
+        
 
 #return render_template("results.html", results=results, query=query)
 
 #Example search
 print("\nSearch Results:")
-search("Platypus")
+print(search("Platypus"))
+
 
