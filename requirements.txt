@@ -1,3 +1,9 @@
 beautifulsoup4
 requests
+<<<<<<< HEAD
 collections
+=======
+collections
+flask
+whoosh
+>>>>>>> 865ef1c08d7a696bc424bcfc1f0006bb09130419
