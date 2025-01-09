@@ -49,6 +49,7 @@ def crawl(start_url, prefix):
         
             # Extract and count words from the page
             page_content = soup.get_text().lower()
+            print(f"Content extracted for {url}: {page_content[:200]}")  # Debug-Ausgabe
             page_title = soup.title.string if soup.title else "No title"
             page_teaser = page_content[:200]
 
@@ -87,6 +88,7 @@ def search(query_str):
 
     search_results = []
     print("searching for", query_str)
+
     # ix.searcher(weighting=scoring.TF_IDF())
     with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
         or_group = qparser.OrGroup.factory(0.8) # make results score higher that include multiple words in the query, but also include those that dont include all words
@@ -94,28 +96,38 @@ def search(query_str):
         query = parser.parse(query_str)
         results = searcher.search(query, scored=True, limit=10)
         
-        # Debug: Print the raw search results
-        print(f"Raw search results for '{query_str}':")
-        for result in results:
-            print(f"URL: {result['url']}, Score: {result.score}")
+        seen_urls = set()  #to track unique URLs
+         # Iterate through search results and count occurrences of query terms
+        query_terms = query_str.lower().split()  # Split query into individual terms
         
-        # add search results to the list
-        seen_urls = set()
-        for result in results:  
-            if result['url'] not in seen_urls:
-                seen_urls.add(result['url'])
-                search_results.append({
-                            "url": result['url'],
-                            "title": result["title"],
-                            "teaser": result["teaser"],
-                            "count": result.score
-                    })
+        for result in results:
+            url = result["url"]
+            if url in seen_urls:
+                continue  # Skip duplicates
+            seen_urls.add(url)
+
+            # Count occurrences of each query term in the content
+            content = result.get("content", "").lower()
+            count = sum(content.count(term) for term in query_terms)  # Total occurrences
+            
+            # Append results to the search results list
+            search_results.append({
+                "url": url,
+                "title": result["title"],
+                "teaser": result["teaser"],
+                "count": count,  # Number of term occurrences
+                "score": result.score  # TF-IDF score
+            })
+            
+    
+    #sort results by relevance (count or score)
+    search_results = sorted(search_results, key=lambda x: (-x["count"], -x["score"]))
     return search_results
 
-
+#to crawl seperated from the search (python crawler.py starts the crawler direct)
 if __name__ == "__main__":
     prefix = 'https://vm009.rz.uos.de/crawl/'
-    start_url = input("Enter the start URL (default: index.html): ") or prefix + 'index.html'
+    start_url = prefix + 'index.html' #input("Enter the start URL (default: index.html): ") or prefix + 
     crawl(start_url, prefix)
 
 # Example search
