@@ -12,66 +12,68 @@ ana = analysis.StandardAnalyzer(stoplist=None, minsize=1) # used to not exclude 
 schema = Schema(
     url=ID(stored=True, unique=True),  # Store URLs (unique identifier)
     title=TEXT(stored=True),  # Store and index titles
-    content=TEXT,  # Index full text content (not stored to save space)
+    content=TEXT(analyzer=ana),  # Index full text content (not stored to save space)
     teaser=TEXT(stored=True)  # Store the teaser for display
 )
 
-# Index directory setup (create or open it)
-if not os.path.exists("indexdir"):
-    os.mkdir("indexdir")
-    ix = create_in("indexdir", schema)
-else:
-    ix = open_dir("indexdir")
+# Initialize or open the Whoosh index
+def get_or_create_index():
+    if not os.path.exists("indexdir"):
+        os.mkdir("indexdir")
+        return create_in("indexdir", schema)
+    return open_dir("indexdir")
 
-prefix = 'https://vm009.rz.uos.de/crawl/'
-start_url = prefix +'index.html'
-agenda = [start_url]
-crawled_pages = set()
+def crawl(start_url, prefix):
+    ix = get_or_create_index()
+    agenda = [start_url]
+    crawled_pages = set()
 
-writer = ix.writer()
+    writer = ix.writer()
 
-while agenda:
-    """Crawl the pages in the agenda and extract the words from the page content"""
-    url = agenda.pop() # crawl the last page in the agenda
-    if url in crawled_pages:  # to make sure that there are no pages doubled
-        continue
-    
-    crawled_pages.add(url) # add it to the set of crawled pages so that no infinite loop is created when pages backlink
-    print("Get ",url)
-    try:
-        r = requests.get(url)
-        if r.status_code != 200:
-            print(f"Failed to fetch {url} (Status: {r.status_code})")
+    while agenda:
+        """Crawl the pages in the agenda and extract the words from the page content"""
+        url = agenda.pop() # crawl the last page in the agenda
+        if url in crawled_pages:  # to make sure that there are no pages doubled
             continue
-
-        soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
+    
+        crawled_pages.add(url) # add it to the set of crawled pages so that no infinite loop is created when pages backlink
+        print("Get ",url)
         
-        # Extract and count words from the page
-        page_content = soup.get_text().lower()
-        page_title = soup.title.string if soup.title else "No title"
-        page_teaser = page_content[:200]
+        try:
+            r = requests.get(url)
+            if r.status_code != 200:
+                print(f"Failed to fetch {url} (Status: {r.status_code})")
+                continue
 
-        writer.add_document(
-            url=url,
-            title=page_title,
-            content=page_content,
-            teaser=page_teaser
-        )
+            soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
+        
+            # Extract and count words from the page
+            page_content = soup.get_text().lower()
+            page_title = soup.title.string if soup.title else "No title"
+            page_teaser = page_content[:200]
 
-        for anchor in soup.find_all('a', href=True):
-            href = anchor['href']  # get URL from the anchor tag
-            if href.startswith('http'):
-                found_url = href
-            else:
-                found_url = prefix + href.lstrip('/')
-            # add url to the agenda if it hasn't been processed yet
-            if found_url.startswith(prefix) and found_url not in crawled_pages:
-                agenda.append(found_url)
-    except Exception as e:
-        print(f"Error while processing {url}: {e}")
+            writer.add_document(
+                url=url,
+                title=page_title,
+                content=page_content,
+                teaser=page_teaser
+            )
 
-writer.commit()  # commit changes to the index
-print("Indexing completed!")
+            for anchor in soup.find_all('a', href=True):
+                href = anchor['href']  # get URL from the anchor tag
+                if href.startswith('http'):
+                    found_url = href
+                else:
+                    found_url = prefix + href.lstrip('/')
+                # add url to the agenda if it hasn't been processed yet
+                if found_url.startswith(prefix) and found_url not in crawled_pages:
+                    agenda.append(found_url)
+        except Exception as e:
+            print(f"Error while processing {url}: {e}")
+
+    writer.commit()  # commit changes to the index
+    print("Crawling completed!")
+
 
 def search(query_str):
     """
@@ -80,6 +82,9 @@ def search(query_str):
     Takes a query and searches the results dictionary for the urls containing the words and 
     returns their URL, title, count
     """
+
+    ix = get_or_create_index()
+
     search_results = []
     print("searching for", query_str)
     # ix.searcher(weighting=scoring.TF_IDF())
@@ -107,6 +112,12 @@ def search(query_str):
                     })
     return search_results
 
+
+if __name__ == "__main__":
+    prefix = 'https://vm009.rz.uos.de/crawl/'
+    start_url = input("Enter the start URL (default: index.html): ") or prefix + 'index.html'
+    crawl(start_url, prefix)
+
 # Example search
-print("\nSearch Results:")
-print(search("do platypus eat"))
+#print("\nSearch Results:")
+#print(search("do platypus eat"))
