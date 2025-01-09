@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--Metatata for the webside-->
+    <!--Metadata for the webside-->
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Search Results</title> <!-- title displayed in the browser tab -->
@@ -19,8 +19,6 @@
                 <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
                 <!-- display the teaser -->
                 <p>{{ result.teaser }}</p>
-                <!-- show how many times the words were found on the page -->
-                <small>Found {{ result.count }} times</small>
             </li>
         {% endfor %}
         </ul>
