@@ -1,13 +1,12 @@
-print("Loading crawler.py")
+# print("Loading crawler.py")
+import os 
 import requests
-from collections import defaultdict
 from bs4 import BeautifulSoup
+from whoosh.index import create_in, open_dir
+from whoosh.fields import Schema, ID, TEXT
+from whoosh import qparser, analysis, scoring
 
-from whoosh.index import create_in
-from whoosh.fields import *
-from whoosh.qparser import QueryParser
-# import os
-
+ana = analysis.StandardAnalyzer(stoplist=None, minsize=1) # used to not exclude stopwords
 
 # Define the schema for the Whoosh index
 schema = Schema(
@@ -17,113 +16,97 @@ schema = Schema(
     teaser=TEXT(stored=True)  # Store the teaser for display
 )
 
+# Index directory setup (create or open it)
+if not os.path.exists("indexdir"):
+    os.mkdir("indexdir")
+    ix = create_in("indexdir", schema)
+else:
+    ix = open_dir("indexdir")
 
 prefix = 'https://vm009.rz.uos.de/crawl/'
-
 start_url = prefix +'index.html'
-
 agenda = [start_url]
-crawled_pages = []
-global results 
-results = defaultdict(lambda: defaultdict(int))  # a nested dictionary for words and their counts on urls
+crawled_pages = set()
+
+writer = ix.writer()
 
 while agenda:
+    """Crawl the pages in the agenda and extract the words from the page content"""
     url = agenda.pop() # crawl the last page in the agenda
-    if url in crawled_pages:  # to make sure that there are no double 
+    if url in crawled_pages:  # to make sure that there are no pages doubled
         continue
     
-    crawled_pages.append(url) # add it to the list of crawled pages so that infinite loop is created when pages backlink
+    crawled_pages.add(url) # add it to the set of crawled pages so that no infinite loop is created when pages backlink
     print("Get ",url)
-    r = requests.get(url)
-    print(r, r.encoding)
+    try:
+        r = requests.get(url)
+        if r.status_code != 200:
+            print(f"Failed to fetch {url} (Status: {r.status_code})")
+            continue
 
-    if r.status_code == 200:
         soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
         
-        """ OLD COUNTER
-        #extract and count words from the page
-        for word in soup.get_text().lower().split():
-            if url not in results[word]:
-                results[word][url] = {
-                    "count": 0,
-                    "title": soup.title.string if soup.title else "No Title", # page title
-                    "teaser": soup.get_text()[:200] #first 200 characters of the page text
-                }
-            results[word][url]["count"] += 1 #increment the word count"""
+        # Extract and count words from the page
+        page_content = soup.get_text().lower()
+        page_title = soup.title.string if soup.title else "No title"
+        page_teaser = page_content[:200]
 
-    
+        writer.add_document(
+            url=url,
+            title=page_title,
+            content=page_content,
+            teaser=page_teaser
+        )
 
-    for anchor in soup.find_all('a'):
-            # to do: only use page links that are on the prefix server
-            href = anchor.get('href') #get URL from the anchor tag
-            print('href type', type(href), href)
-            found_url = '' 
-            if prefix in href:
+        for anchor in soup.find_all('a', href=True):
+            href = anchor['href']  # get URL from the anchor tag
+            if href.startswith('http'):
                 found_url = href
-            elif 'www' not in href and 'http' not in href:
-                found_url = prefix + href
+            else:
+                found_url = prefix + href.lstrip('/')
             # add url to the agenda if it hasn't been processed yet
-            if len(found_url)!=0 and found_url not in crawled_pages and found_url not in agenda:
+            if found_url.startswith(prefix) and found_url not in crawled_pages:
                 agenda.append(found_url)
+    except Exception as e:
+        print(f"Error while processing {url}: {e}")
 
-            
-            found_link = anchor.get('href')
-            if prefix in anchor:
-                if found_link not in crawled_pages:
-                    agenda.append(found_link) # test if there yet?
-            elif ('www.' or 'http') not in str(anchor):
-                found_url = prefix+anchor.get('href') 
-                if found_url not in crawled_pages:
-                    agenda.append(found_url) 
+writer.commit()  # commit changes to the index
+print("Indexing completed!")
 
-def search(word_list):
+def search(query_str):
     """
-    Parameter: list (of word, all in lowercase letters)
+    Parameter: query_str (string)
     Return: list of results
-    Takes a list of words and searches the results dictionary for the urls containing the words and 
+    Takes a query and searches the results dictionary for the urls containing the words and 
     returns their URL, title, count
     """
     search_results = []
-    for word in word_list:
-        if word in results:
-            for url, data in results[word].items():
+    print("searching for", query_str)
+    # ix.searcher(weighting=scoring.TF_IDF())
+    with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
+        or_group = qparser.OrGroup.factory(0.8) # make results score higher that include multiple words in the query, but also include those that dont include all words
+        parser = qparser.MultifieldParser(["title", "content"], schema=ix.schema, group=or_group)
+        query = parser.parse(query_str)
+        results = searcher.search(query, scored=True, limit=10)
+        
+        # Debug: Print the raw search results
+        print(f"Raw search results for '{query_str}':")
+        for result in results:
+            print(f"URL: {result['url']}, Score: {result.score}")
+        
+        # add search results to the list
+        seen_urls = set()
+        for result in results:  
+            if result['url'] not in seen_urls:
+                seen_urls.add(result['url'])
                 search_results.append({
-                    "url": url,
-                    "title": data["title"],
-                    "teaser": data["teaser"],
-                    "count": data["count"]
-                })
+                            "url": result['url'],
+                            "title": result["title"],
+                            "teaser": result["teaser"],
+                            "count": result.score
+                    })
     return search_results
 
-page_content = soup.get_text().lower()
-page_title = soup.title.string if soup.title else "No title"
-page_teaser = page_content[:200]
-
-ix = create_in("indexdir", schema)
-writer = ix.writer()
-
-    # Add the document to the Whoosh index
-writer.add_document(
-    url=url,
-    title = page_title,
-    content = page_content,
-    teaser = page_teaser
-)
-
-writer.commit()
-
-# Print results (all words, URLs and the metadate - URL, title, count)
-for word, urls in results.items():
-    for url, data in urls.items():
-        print(f"'{word}' found {data['count']} times on {url}")
-
-
-
-with ix.searcher() as searcher:
-    # find entries with the word "the"
-    query = QueryParser("content", ix.schema).parse("the")
-    results = searcher.search(query)
-    
-    # print all results
-    for r in results:
-        print(r)
+#Example search
+#print("\nSearch Results:")
+#print(search("do platypus eat"))

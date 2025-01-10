@@ -1,12 +1,10 @@
 print("Loading app.py")
 from flask import Flask, request, render_template
-#from crawler import search # import search function from crawler.py 
-from testerei import search
-
+from crawler import search # import search function from crawler.py 
 
 app = Flask(__name__) # create instance of Flask app
 
-@app.route('/') # define home rout ("/")
+@app.route('/') # define home route ("/")
 def home():
     # diplay a basic search form
     return '''
@@ -21,14 +19,10 @@ def home():
 def search_route():
     query = request.args.get('q')  # get search query from URL parameters
     if query:
-        words = query.lower().split()  # convert to lowercase and split into individual words
-        if isinstance(words,list):
-            words=" ".join(words)
-        results = search(words)  # pass to search function (crawler.py)
+        results = search(query)  # pass to search function (crawler.py)
         return render_template('results.html', results=results)  # pas results to HTML tamplate
     return 'No query!'
 
 # run the app in debug mode if this file is executed directly
 if __name__ == '__main__':
     app.run(debug=True)
-

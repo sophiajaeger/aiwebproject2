@@ -5,31 +5,109 @@
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Search Results</title> <!-- title displayed in the browser tab -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center; /* Center the main container horizontally */
+            align-items: center; /* Center the main container vertically */
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('/static/images/background picture.jpg') no-repeat center center fixed; /* Sourcehttps://unsplash.com/de/fotos/blaue-und-schwarze-abstrakte-malerei-prMn9KINLtI*/
+            background-size: cover;
+            background-blend-mode: darken;
+            color: #121c25; /* Default text color*/
+        }
+
+        /* Main container styles */
+        .container {
+            background-color: rgba(173, 215, 230, 0.5); /* A lighter shade of blue for the middle part */
+            width: 80%; /* Restrict the width to 80% of the screen */
+            max-width: 1200px; /* Limit the width for large screens */
+            padding: 20px; /* Add padding inside the container */
+            border-radius: 8px; /* Rounded corners for a modern look */
+            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Add a shadow for depth */
+        }
+
+        /* Style the main heading */
+        h1 {
+            font-size: 3rem; /* Large heading */
+            margin-bottom: 20px; /* Add spacing below the heading */
+            text-align: left; /* Align text to the left */
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Style the unordered list */
+        ul {
+            list-style-type: none; /* Remove bullets */
+            padding: 0;
+            margin: 0; /* Remove default margin */
+        }
+
+        /* Style individual list items */
+        li {
+            font-size: 1.2rem; /* Adjust font size */
+            margin-bottom: 20px; /* Add spacing between items */
+        }
+
+        /* Style links */
+        a {
+            font-size: 1.5rem; /* Increase link size */
+            color: #121c25; /* Light blue for links */
+            text-decoration: none; /* Remove underline */
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        /* Style teaser text */
+        p {
+            font-size: 1rem; /* Smaller than links */
+            color: black; /* Light grey for teaser text */
+            margin: 5px 0;
+        }
+
+        /* Style the small text */
+       
+
+        /* Style the "Back to Search" link */
+        a[href="/"] {
+            font-size: 1.2rem;
+            margin-top: 30px;
+            color: #121c25; /* Match link color */
+            display: inline-block; /* Ensure margin works properly */
+        }
+
+        a[href="/"]:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <!-- main content(all you can see): -->
-    <h1>Search Results</h1> <!-- heading for the results page -->
+    <div class="container">
+        <!-- main content(all you can see): -->
+        <h1>Search Results</h1> <!-- heading for the results page -->
 
-    {% if results %}
-        <ul>
-        <!-- iterate over each result in the results list -->
-        {% for result in results %}
-            <li>
-                <!-- link to the found URL + opens in a new tab -->
-                <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
-                <!-- display the teaser -->
-                <p>{{ result.teaser }}</p>
-                <!-- show how many times the words were found on the page -->
-                <small>Found {{ result.count }} times</small>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <!--if not found display:-->
-        <p>Word(s) not found.</p>
-    {% endif %}
+        {% if results %}
+            <ul>
+            <!-- iterate over each result in the results list -->
+            {% for result in results %}
+                <li>
+                    <!-- link to the found URL + opens in a new tab -->
+                    <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+                    <!-- display the teaser -->
+                    <p>{{ result.teaser }}</p>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <!--if not found display:-->
+            <p>Word(s) not found.</p>
+        {% endif %}
 
-    <!--link to go back to the search engine-->
-    <a href="/">Back to Search</a>
+        <!--link to go back to the search engine-->
+        <a href="/">Back to Search</a>
+    </div>
 </body>
 </html>
