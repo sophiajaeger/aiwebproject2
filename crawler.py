@@ -1,9 +1,14 @@
 import os 
 import requests
+import re
+import sys
 from bs4 import BeautifulSoup
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, ID, TEXT
 from whoosh import qparser, analysis, scoring
+
+# Increase the recursion limit if necessary
+sys.setrecursionlimit(10000)
 
 ana = analysis.StandardAnalyzer(stoplist=None, minsize=1) # used to not exclude stopwords
 
@@ -20,6 +25,13 @@ def get_or_create_index():
         os.mkdir("indexdir")
         return create_in("indexdir", schema)
     return open_dir("indexdir")
+
+def normalize_url(url, prefix):
+    """Normalize URLs by adding the prefix if they are relative"""
+    if url.startswith('http'):
+        return url
+    else:
+        return prefix + url.lstrip('/')
 
 def crawl(start_url, prefix):
     ix = get_or_create_index()
@@ -46,24 +58,37 @@ def crawl(start_url, prefix):
             soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
             
             # Extract and count words from the page
-            page_content = soup.get_text().lower()
+            page_content = soup.get_text()
             page_title = soup.title.string if soup.title else "No title"
-            page_teaser = page_content[:200]
+            
+            # Extract the first 50 words for the teaser
+            words = page_content.split()
+            teaser_words = words[:50]
+            page_teaser = ' '.join(teaser_words)
+            # Find the position of the 50th word in the original content
+            teaser_end_pos = page_content.find(page_teaser) + len(page_teaser)
+            # Extend the teaser to complete the sentence
+            remaining_text = page_content[teaser_end_pos:]
+            sentence_end = re.search(r'[.!?]', remaining_text)
+            if sentence_end:
+                page_teaser += remaining_text[:sentence_end.end()]
 
             writer.add_document(
                 url=url,
                 title=page_title,
-                content=page_content,
+                content=page_content.lower(),
                 teaser=page_teaser
             )
 
             # Extract links from the page and add them to the agenda
             for anchor in soup.find_all('a', href=True):
                 href = anchor['href']  # get URL from the anchor tag
-                if href.startswith('http'):
+                found_url = normalize_url(href, prefix)
+                """if href.startswith('http'):
                     found_url = href
                 else:
                     found_url = prefix + href.lstrip('/')
+                    """
                 # add url to the agenda if it hasn't been processed yet
                 if found_url.startswith(prefix) and found_url not in crawled_pages:
                     agenda.append(found_url)
@@ -104,6 +129,7 @@ def search(query_str):
                             "count": result.score
                     })
                 
+        
         # search for a better query string
         corrected = searcher.correct_query(query, query_str, prefix=1) # each word must have at least the first letter in common with the word in the original query to speed up search
         if corrected.query != query:
@@ -116,7 +142,7 @@ def search(query_str):
 
 #to crawl seperated from the search (python crawler.py starts the crawler direct)
 if __name__ == "__main__":
-    prefix = 'https://vm009.rz.uos.de/crawl/'
+    prefix = 'https://vm009.rz.uos.de/crawl/' # 'https://interestingfacts.com/'
     start_url = prefix + 'index.html' #input("Enter the start URL (default: index.html): ") or prefix + 
     crawl(start_url, prefix)
 

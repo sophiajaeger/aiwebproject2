@@ -1,21 +1,12 @@
-print("Loading app.py")
 from flask import Flask, request, render_template
 from crawler import search # import search function from crawler.py 
-# from testerei import search
 
 app = Flask(__name__) # create instance of Flask app
 
 @app.route('/') # define home route ("/")
 def home():
     # diplay a basic search form
-    return '''
-    <h1>BrainBite</h1>
-    <h2> The search engine to feed your curiosity</h2>
-    <form action="/search" method="get">
-        <input type="text" name="q" placeholder="Search for words" required>
-        <button type="submit">Search</button>
-    </form>
-    '''
+    return render_template('home.html')
 
 @app.route('/search') # define the search rout ("/search")
 def search_route():
