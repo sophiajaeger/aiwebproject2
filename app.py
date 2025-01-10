@@ -9,7 +9,8 @@ app = Flask(__name__) # create instance of Flask app
 def home():
     # diplay a basic search form
     return '''
-    <h1>Search Engine:</h1>
+    <h1>BrainBite</h1>
+    <h2> The search engine to feed your curiosity</h2>
     <form action="/search" method="get">
         <input type="text" name="q" placeholder="Search for words" required>
         <button type="submit">Search</button>
