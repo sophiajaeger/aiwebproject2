@@ -6,6 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Search Results</title> <!-- title displayed in the browser tab -->
     <style>
+        .suggestions-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f0f8ff; /* Light blue background */
+            display: inline-block;
+            width: 25%;
+        }
+        .suggestions-box p {
+            background-color: #cfe2f3; /* Slightly darker blue */
+            padding: 10px;
+            border-radius: 5px; /* Rounded corners */
+            color: black; /* Text color */
+        }
+        .suggestions-heading {
+            font-weight: bold; /* Make the heading bold */
+            margin-top: 10px;
+        }
+        .suggestions-box a {
+            background-color: #fff0b3; /* Yellow background */
+            padding: 5px 10px;
+            text-decoration: none;
+            color: blue;
+            border: 1px solid #ccc; /* Add border */
+            border-radius: 5px; /* Rounded corners */
+            margin: 5px 0; /* Add some margin */
+            display: inline-block; /* Display links as block */
+        }
+        .suggestions-box a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
         body {
             display: flex;
             justify-content: center; /* Center the main container horizontally */
@@ -87,7 +117,14 @@
     <div class="container">
         <!-- main content(all you can see): -->
         <h1>Search Results</h1> <!-- heading for the results page -->
-
+        {% if suggestions%}
+            <div class="suggestions-box">
+                <p>Did you mean:</p>
+                {% for suggestion in suggestions %}
+                    <a href="/search?q={{ suggestion }}">{{ suggestion }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </div>
+        {%endif%}
         {% if results %}
             <ul>
             <!-- iterate over each result in the results list -->
