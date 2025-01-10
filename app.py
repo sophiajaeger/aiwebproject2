@@ -1,6 +1,6 @@
 print("Loading app.py")
 from flask import Flask, request, render_template
-from crawler import search # import search function from crawler.py 
+from search import search # import search function from crawler.py 
 # from testerei import search
 
 app = Flask(__name__) # create instance of Flask app
