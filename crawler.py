@@ -11,9 +11,9 @@ ana = analysis.StandardAnalyzer(stoplist=None, minsize=1) # used to not exclude 
 # Define the schema for the Whoosh index
 schema = Schema(
     url=ID(stored=True, unique=True),  # Store URLs (unique identifier)
-    title=TEXT(stored=True),  # Store and index titles
-    content=TEXT,  # Index full text content (not stored to save space)
-    teaser=TEXT(stored=True)  # Store the teaser for display
+    title=TEXT(stored=True, spelling=True),  # Store and index titles
+    content=TEXT(spelling=True),  # Index full text content (not stored to save space)
+    teaser=TEXT(stored=True, spelling=True)  # Store the teaser for display
 )
 
 # Index directory setup (create or open it)
@@ -58,6 +58,7 @@ while agenda:
             teaser=page_teaser
         )
 
+        # Extract links from the page and add them to the agenda
         for anchor in soup.find_all('a', href=True):
             href = anchor['href']  # get URL from the anchor tag
             if href.startswith('http'):
@@ -80,22 +81,19 @@ def search(query_str):
     Takes a query and searches the results dictionary for the urls containing the words and 
     returns their URL, title, count
     """
+    ix = open_dir("indexdir") # needed?!
     search_results = []
+    seen_urls = set()
+    suggestions = []
     print("searching for", query_str)
-    # ix.searcher(weighting=scoring.TF_IDF())
+    
     with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
         or_group = qparser.OrGroup.factory(0.8) # make results score higher that include multiple words in the query, but also include those that dont include all words
         parser = qparser.MultifieldParser(["title", "content"], schema=ix.schema, group=or_group)
         query = parser.parse(query_str)
         results = searcher.search(query, scored=True, limit=10)
         
-        # Debug: Print the raw search results
-        print(f"Raw search results for '{query_str}':")
-        for result in results:
-            print(f"URL: {result['url']}, Score: {result.score}")
-        
         # add search results to the list
-        seen_urls = set()
         for result in results:  
             if result['url'] not in seen_urls:
                 seen_urls.add(result['url'])
@@ -105,8 +103,17 @@ def search(query_str):
                             "teaser": result["teaser"],
                             "count": result.score
                     })
-    return search_results
+                
+        # search for a better query string
+        corrected = searcher.correct_query(query, query_str, prefix=1) # each word must have at least the first letter in common with the word in the original query to speed up search
+        if corrected.query != query:
+            corrected_results = searcher.search(corrected.query, scored=True)
+            # decide whether to show the suggested corrected query
+            if not search_results or (len(search_results) < 3 and len(corrected_results) >= 3) or corrected_results[0].score > search_results[0]['count']:
+                suggestions = [corrected.string]
+            
+    return search_results, suggestions
 
 # Example search
 print("\nSearch Results:")
-print(search("do platypus eat"))
+print(search("las platipus"))

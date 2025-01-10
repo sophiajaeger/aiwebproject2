@@ -20,8 +20,8 @@ def home():
 def search_route():
     query = request.args.get('q')  # get search query from URL parameters
     if query:
-        results = search(query)  # pass to search function (crawler.py)
-        return render_template('results.html', results=results)  # pas results to HTML tamplate
+        results, suggestions = search(query)  # pass to search function (crawler.py)
+        return render_template('results.html', results=results, suggestions = suggestions)  # pas results to HTML tamplate
     return 'No query!'
 
 # run the app in debug mode if this file is executed directly
