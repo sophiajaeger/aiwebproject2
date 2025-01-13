@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from crawler import search # import search function from crawler.py 
+from search import search # import search function from crawler.py 
 
 app = Flask(__name__) # create instance of Flask app
 

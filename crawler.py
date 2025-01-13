@@ -58,20 +58,31 @@ def crawl(start_url, prefix):
             soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
             
             # Extract and count words from the page
-            page_content = soup.get_text()
+            page_content = soup.get_text(separator='')
             page_title = soup.title.string if soup.title else "No title"
             
-            # Extract the first 50 words for the teaser
+            """# Extract the first 50 words for the teaser
             words = page_content.split()
             teaser_words = words[:50]
             page_teaser = ' '.join(teaser_words)
             # Find the position of the 50th word in the original content
             teaser_end_pos = page_content.find(page_teaser) + len(page_teaser)
             # Extend the teaser to complete the sentence
-            remaining_text = page_content[teaser_end_pos:]
+            remaining_text = 'REMAINDER:'+ page_content[teaser_end_pos:]
             sentence_end = re.search(r'[.!?]', remaining_text)
             if sentence_end:
-                page_teaser += remaining_text[:sentence_end.end()]
+                page_teaser += remaining_text[:sentence_end.end()]"""
+            
+            # Extract the first three sentences for the teaser
+            sentence_endings = re.finditer(r'[.!?]', page_content[:1000])
+            end_positions = [match.end() for match in sentence_endings]
+            if len(end_positions) >= 3:
+                teaser_end_pos = end_positions[2]
+            elif len(end_positions) > 0:
+                teaser_end_pos = end_positions[-1]
+            else:
+                teaser_end_pos = len(page_content)
+            page_teaser = page_content[:teaser_end_pos]
 
             writer.add_document(
                 url=url,
@@ -97,48 +108,6 @@ def crawl(start_url, prefix):
 
     writer.commit()  # commit changes to the index
     print("Crawling completed!")
-
-def search(query_str):
-    """
-    Parameter: query_str (string)
-    Return: list of results
-    Takes a query and searches the results dictionary for the urls containing the words and 
-    returns their URL, title, count
-    """
-    ix = get_or_create_index()
-    search_results = []
-    seen_urls = set()
-    suggestions = []
-    print("searching for", query_str)
-    
-    with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
-        or_group = qparser.OrGroup.factory(0.8) # make results score higher that include multiple words in the query, but also include those that dont include all words
-        parser = qparser.MultifieldParser(["title", "content"], schema=ix.schema, group=or_group)
-        query = parser.parse(query_str)
-        results = searcher.search(query, scored=True, limit=10)
-        
-        # add search results to the list
-        for result in results:  
-            url = result["url"]
-            if url not in seen_urls:
-                seen_urls.add(result['url'])
-                search_results.append({
-                            "url": url,
-                            "title": result["title"],
-                            "teaser": result["teaser"],
-                            "count": result.score
-                    })
-                
-        
-        # search for a better query string
-        corrected = searcher.correct_query(query, query_str, prefix=1) # each word must have at least the first letter in common with the word in the original query to speed up search
-        if corrected.query != query:
-            corrected_results = searcher.search(corrected.query, scored=True)
-            # decide whether to show the suggested corrected query
-            if not search_results or (len(search_results) < 3 and len(corrected_results) >= 3) or corrected_results[0].score > search_results[0]['count']:
-                suggestions = [corrected.string]
-            
-    return search_results, suggestions
 
 #to crawl seperated from the search (python crawler.py starts the crawler direct)
 if __name__ == "__main__":
