@@ -122,6 +122,13 @@ Dependencies:
 - Enter a search query in the search bar
 - Explore the search results and suggested corrections
 
+## Deployment
+To deploy the project on a demo server:
+1. Upload project files to the server.
+2. Install dependencies with pip install -r requirements.txt.
+3. Run crawler.py to build the index.
+4. Start the Flask app with python app.py.
+
 ## Support
 For issues or inquiries, please contact:
 Email: 
