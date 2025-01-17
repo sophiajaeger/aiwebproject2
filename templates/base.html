@@ -8,6 +8,14 @@
     <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
     <style>
 
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
         #content {
             overflow-y: scroll;
         }
@@ -207,47 +215,6 @@
             text-decoration: underline; /*underline when hovering over the link*/
         }
 
-        /* Suggestions box */
-        .suggestions-container {
-            display: flex;
-            justify-content: center; /* Center the suggestions box horizontally */
-            width: 100%;
-        }
-        .suggestions-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #dbeefe; /* Light blue background */
-            display: inline-block;
-            width: 25%;
-            border-radius: 5px; /* Rounded corners */
-
-        }
-        .suggestions-box p {
-            background-color: #8ba4b9; /* Slightly darker blue */
-            padding: 10px;
-            font-size: 1.25rem;
-            border-radius: 5px; /* Rounded corners */
-            color: black; /* Text color */
-            text-align: center;
-        }
-        .suggestions-heading {
-            font-weight: bold; /* Make the heading bold */
-            margin-top: 10px;
-        }
-        .suggestions-box a {
-            background-color: #f7e2e7; /* Yellow background */
-            padding: 5px 10px;
-            text-decoration: none;
-            color: #4b273f; 
-            border: 1px solid #ccc; /* Add border */
-            border-radius: 5px; /* Rounded corners */
-            margin: 5px 0; /* Add some margin */
-            display: inline-block; /* Display links as block */
-        }
-        .suggestions-box a:hover {
-            text-decoration: underline; /* Underline on hover */
-        }
-
         ul {
             list-style-type: none; /* Remove bullet points */
             padding: 10; /* Remove default padding */
@@ -264,7 +231,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            color: #7e959b;
+            color: #1E90FF;
             font-size: 1rem;
         }
 
@@ -276,7 +243,7 @@
 
     </style>
     <script>
-        function bookmarkResult(url, title, teaser, button) {
+        function bookmarkResult(url, title, teaser) {
             fetch('/bookmark', {
                 method: 'POST',
                 headers: {
@@ -285,12 +252,7 @@
                 body: JSON.stringify({ url: url, title: title, teaser: teaser })
             }).then(response => {
                 if (response.ok) {
-                    button.querySelector('img').src = '/static/images/bookmark_filled.png';
-                    button.disabled = true;
                     alert('Bookmark added!');
-                } else if (response.status === 401) {  // Unauthorized
-                    alert('You need to log in to bookmark this item.');
-                    window.location.href = '/login';  // Redirect to login
                 } else {
                     alert('Failed to add bookmark.');
                 }
@@ -342,8 +304,8 @@
                     <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
                     <!-- display the teaser -->
                     <p>{{ result.teaser }}</p>
-                    <button class="bookmark-button" onclick="bookmarkResult('{{ result.url }}', '{{ result.title }}', '{{ result.teaser }}', this)">
-                        <img src="/static/images/bookmark.png" alt="Bookmark Icon"> Bookmark
+                    <button class="bookmark-button" onclick="bookmarkResult('{{ result.url }}', '{{ result.title }}', '{{ result.teaser }}')">
+                        <img src="/static/images/book-icon.png" alt="Bookmark Icon"> Bookmark
                     </button>
                 </li>
             {% endfor %}

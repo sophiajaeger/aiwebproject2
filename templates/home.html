@@ -6,6 +6,16 @@
     <title>Home</title>
     <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
     <style>
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            align-items: right;
+            z-index: 1000;
+            justify-content: space-between;
+        }
+
         body{
             background: url('/static/images/background_home.jpg') no-repeat center center fixed; /* Source: https://unsplash.com/de/fotos/blaue-und-schwarze-abstrakte-malerei-prMn9KINLtI*/
             background-size: cover;
@@ -20,8 +30,51 @@
             text-align: center;
         }
 
+        .profile-tab {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .profile-tab img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 10px;
+            color: #4C5E64;
+            text-decoration: none;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .profile-tab:hover .profile-dropdown {
+            display: block;
+        }
+
         .container{
             display:flex;
+            position: fixed;
             flex-direction: column;
             align-items: center;
             gap: 20px;
@@ -80,6 +133,19 @@
     </style>
 </head>
 <body>
+    <div class="header" id="myHeader">
+        <div class="profile-tab">
+            <img src="/static/images/profile-icon-white.png" alt="Profile Icon">
+            <div class="profile-dropdown">
+                {% if current_user.is_authenticated %}
+                    <a href="/bookmarks">View Bookmarks</a>
+                    <a href="/logout">Logout</a>
+                {% else %}
+                    <a href="/login">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div class="logo-title">
             <img src="/static/images/logo.png" alt="BrainBite Logo" width="100px">

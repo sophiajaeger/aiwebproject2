@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
+    <title>Your Bookmarks</title> <!-- title displayed in the browser tab -->
+    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
+    <style>
+        #content {
+            overflow-y: scroll;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            color: #4C5E64;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000; 
+        }
+
+        .header .logo-title {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .header .logo-title img {
+            margin-right: 10px;
+        }
+
+        .header .logo-title h2 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .header form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            margin-left: 20px; /* Add margin to center the search bar */
+            margin-right: 250px; /* Add margin to center the search bar */
+        }
+
+        .profile-tab {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .profile-tab img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 10px;
+            color: #4C5E64;
+            text-decoration: none;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .profile-tab:hover .profile-dropdown {
+            display: block;
+        }
+
+        .footer {
+            position: sticky;
+            overflow:hidden;
+            bottom: 0;
+            height: 4vh;
+            margin: 0px;
+            color: #4C5E64;
+            background-color: white;
+            width: 100%;
+            padding: 10px; /* Add some padding */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center the main container vertically */
+            justify-content: center; /* Center the main container horizontally */
+            align-items: center; /* Center the main container vertically */
+            min-height: 100vh;
+            margin: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #20263F;
+            background: url('/static/images/background_results.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-blend-mode: darken;
+            color: #121c25; /* Default text color*/
+        }
+
+        /* Main container styles */
+        .container {
+            background-color: rgba(255, 255, 255, 0.3); /* light blue for the middle part with 0.5 transparency*/
+            width: 85%; /* Restrict the width to 80% of the screen */
+            margin: 0 auto; /* Center the container horizontally */
+            max-width: 1200px; /* Limit the width for large screens */
+            padding: 20px; /* Add padding inside the container */
+            border-radius: 8px; /* Rounded corners */
+            text-align: justify;
+            flex: 1;
+            min-height: 50px; /* Minimum height to avoid squished look */
+            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /*shadow of middle part*/
+        }
+
+        /* Style the main heading */
+        h1 {
+            font-size: 3rem; /* Large heading */
+            margin: 20px 0; /*spacing below the heading */
+            text-align: center; /* Align text to left side */
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Style links */
+        a {
+            font-size: 1.5rem; /* Increase link size */
+            color: #f7d8e0; 
+            text-decoration: none; /* Remove underline */
+            /* add some space above*/
+            margin-top: 10px;
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        /* Style teaser text */
+        p {
+            font-size: 1rem; /* Smaller than links */
+            color: #e2e2e2; 
+            margin: 5px 0;
+        }
+
+        /* Style the "Back to Search" link */
+        .footer a[href="/"] {
+            font-size: 1.2rem;
+            color: #4C5E64;
+            display: inline-block; /* Ensure margin works properly */
+            text-align: center;
+            margin-bottom: 10;
+            margin-left: 10;
+            padding-bottom: 10px;
+        }
+
+        .footer a[href="/"]:hover {
+            text-decoration: underline; /*underline when hovering over the link*/
+        }
+
+        ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 10; /* Remove default padding */
+        }
+
+        /* Add space between results */
+        li {
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="myHeader">
+        <div class="logo-title">
+            <img src="/static/images/favicon.png" alt="BrainBite Logo" style="width: 60px; height: 60px;">
+            <h2>BrainBite</h2>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Your Bookmarks</h1>
+        {% if bookmarks %}
+            <ul>
+            {% for bookmark in bookmarks %}
+                <li>
+                    <a href="{{ bookmark[0] }}" target="_blank">{{ bookmark[1] }}</a>
+                    <p>{{ bookmark[2] }}</p>
+                    <form action="/remove_bookmark" method="post">
+                        <input type="hidden" name="url" value="{{ bookmark[0] }}">
+                        <button type="submit">Remove</button>
+                    </form>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No bookmarks found.</p>
+        {% endif %}
+    </div>
+    <div class = "footer">
+        <h2>
+            <!--link to go back to the search engine's home page-->
+            <a href="/">Back to Home</a>
+        </h2>
+    </div>
+</body>
+</html>
