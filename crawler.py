@@ -3,14 +3,9 @@ import requests
 import re
 import sys
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urldefrag
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, ID, TEXT
-from whoosh import qparser, analysis, scoring
-
-# Increase the recursion limit if necessary
-sys.setrecursionlimit(10000)
-
-ana = analysis.StandardAnalyzer(stoplist=None, minsize=1) # used to not exclude stopwords
 
 # Define the schema for the Whoosh index
 schema = Schema(
@@ -32,6 +27,9 @@ def normalize_url(url, prefix):
         return url
     else:
         return prefix + url.lstrip('/')
+    full_url = urljoin(prefix, url)
+    clean_url, _ = urldefrag(full_url)  # Remove fragment identifiers
+    return clean_url
 
 def crawl(start_url, prefix):
     ix = get_or_create_index()
@@ -39,7 +37,6 @@ def crawl(start_url, prefix):
     crawled_pages = set()
 
     writer = ix.writer()
-
     while agenda:
         """Crawl the pages in the agenda and extract the words from the page content"""
         url = agenda.pop() # crawl the last page in the agenda
@@ -47,7 +44,7 @@ def crawl(start_url, prefix):
             continue
         
         crawled_pages.add(url) # add it to the set of crawled pages so that no infinite loop is created when pages backlink
-        print("Get ",url)
+        print("Get ",url, "(", len(crawled_pages)-1, "pages crawled so far)")
 
         try:
             r = requests.get(url)
@@ -56,67 +53,72 @@ def crawl(start_url, prefix):
                 continue
 
             soup = BeautifulSoup(r.content, 'html.parser') # parse the HTML content
-            
-            # Extract and count words from the page
-            page_content = soup.get_text(separator='')
-            page_title = soup.title.string if soup.title else "No title"
-            
-            """# Extract the first 50 words for the teaser
-            words = page_content.split()
-            teaser_words = words[:50]
-            page_teaser = ' '.join(teaser_words)
-            # Find the position of the 50th word in the original content
-            teaser_end_pos = page_content.find(page_teaser) + len(page_teaser)
-            # Extend the teaser to complete the sentence
-            remaining_text = 'REMAINDER:'+ page_content[teaser_end_pos:]
-            sentence_end = re.search(r'[.!?]', remaining_text)
-            if sentence_end:
-                page_teaser += remaining_text[:sentence_end.end()]"""
-            
-            # Extract the first three sentences for the teaser
-            sentence_endings = re.finditer(r'[.!?]', page_content[:1000])
-            end_positions = [match.end() for match in sentence_endings]
+
+            # extract links from the page and add them to the agenda
+            for anchor in soup.find_all('a', href=True):
+                href = anchor['href']  # get URL from the anchor tag
+                found_url = normalize_url(href, prefix)
+                # exclude unwanted URLs
+                if 'cdn-cgi/l/email-protection' in found_url:
+                    continue
+                # add url to the agenda if it hasn't been processed yet
+                if found_url.startswith(prefix) and found_url not in crawled_pages:
+                    agenda.append(found_url)
+
+            article = soup.find('article')
+            if article:
+                # extract title and description
+                page_title = article.find('h1').get_text(strip=True)
+                description_div = article.find('div', class_='description')
+                if description_div:
+                    description_paragraphs = description_div.find_all('p')
+                    description_text = ' '.join(p.get_text(separator=' ', strip=True) for p in description_paragraphs)
+                else:
+                    description_text = ""  # no description found
+                
+                # extract all the text for the content
+                content_paragraphs = article.find_all('p')
+                page_content = ' '.join(p.get_text(separator=' ', strip=True) for p in content_paragraphs)
+
+                # Use the description as the teaser
+                page_teaser = description_text
+
+            else: # if no article, fall back to general content
+                page_title = soup.title.string if soup.title else "No title"
+                # extract content from the main area
+                main_content = soup.find('main')  
+                if not main_content:  # if there's no <main>, fall back to body
+                    main_content = soup.body
+                
+                content_paragraphs = main_content.find_all('p')  
+                page_content = ' '.join(p.get_text(separator=' ', strip=True) for p in content_paragraphs)
+                page_teaser = page_content[:450]  # first 450 characters as an initial teaser
+
+            # Extract the first three sentences from the teaser
+            sentence_endings = re.finditer(r'[.!?]', page_teaser)
+            end_positions = [ending.end() for ending in sentence_endings]
             if len(end_positions) >= 3:
                 teaser_end_pos = end_positions[2]
             elif len(end_positions) > 0:
                 teaser_end_pos = end_positions[-1]
             else:
-                teaser_end_pos = len(page_content)
-            page_teaser = page_content[:teaser_end_pos]
+                teaser_end_pos = len(page_teaser)
+            page_teaser = page_teaser[:teaser_end_pos]
 
             writer.add_document(
                 url=url,
-                title=page_title,
-                content=page_content.lower(),
-                teaser=page_teaser
+                title=str(page_title),
+                content=str(page_content.lower()),
+                teaser=str(page_teaser)
             )
-
-            # Extract links from the page and add them to the agenda
-            for anchor in soup.find_all('a', href=True):
-                href = anchor['href']  # get URL from the anchor tag
-                found_url = normalize_url(href, prefix)
-                """if href.startswith('http'):
-                    found_url = href
-                else:
-                    found_url = prefix + href.lstrip('/')
-                    """
-                # add url to the agenda if it hasn't been processed yet
-                if found_url.startswith(prefix) and found_url not in crawled_pages:
-                    agenda.append(found_url)
+            
         except Exception as e:
             print(f"Error while processing {url}: {e}")
-
     writer.commit()  # commit changes to the index
-    print("Crawling completed!")
+    print(f"Crawling completed! {len(crawled_pages)} pages found.")
 
 #to crawl seperated from the search (python crawler.py starts the crawler direct)
 if __name__ == "__main__":
-    prefix = 'https://vm009.rz.uos.de/crawl/' # 'https://interestingfacts.com/'
-    start_url = prefix + 'index.html' #input("Enter the start URL (default: index.html): ") or prefix + 
+    prefix = 'https://interestingfacts.com/' # 'https://vm009.rz.uos.de/crawl/' # 
+    start_url = prefix + '' #'index.html' #input("Enter the start URL (default: index.html): ") or prefix + 
     crawl(start_url, prefix)
-
-"""
-# Example search
-print("\nSearch Results:")
-print(search("las platipus"))
-"""
