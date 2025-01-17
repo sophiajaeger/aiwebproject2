@@ -4,10 +4,12 @@
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Home</title>
-    <link rel="icon" type="image" href="{{ url_for('static', filename='images/favicon.png') }}"> <!-- icon displayed in the browser tab -->
+    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
+
+    <!-- css styles for the home page -->
     <style>
         body{
-            background: url("{{ url_for('static', filename='images/background_home.jpg') }}") no-repeat center center fixed;
+            background: url('/static/images/background_home.jpg') no-repeat center center fixed; /* Source: https://unsplash.com/de/fotos/blaue-und-schwarze-abstrakte-malerei-prMn9KINLtI*/
             background-size: cover;
             color: white;
             font-family: Arial, sans-serif;
@@ -27,27 +29,26 @@
             gap: 20px;
         }
 
-        /* Flex container for logo and title */
+
         .logo-title {
             display: flex;
-            align-items: center; /* Align items vertically in the center */
-            justify-content: center; /* Center the items horizontally */
+            align-items: center; 
+            justify-content: center;
         }
 
         .logo-title img {
-            margin-right: 10px; /* Space between the logo and the text */
+            margin-right: 10px;
         }
 
         h1 {
-            font-size: 4rem; /* Large heading */
-            margin-bottom: 20px; /*spacing below the heading */
+            font-size: 4rem; 
+            margin-bottom: 20px; 
             margin: 0;
         }
 
         h2 {
             font-size: 2.5rem;
             margin:0;
-            /*margin-bottom: 20px; /*spacing below the heading */
         }
 
         form {
@@ -72,7 +73,7 @@
             height: 70px;
             width: 70px;
             border: none;
-            background-color: #aeb1b3;
+            background-color: #f5e3e7;
             color: white;
             border-radius: 0 5px 5px 0;
             cursor: pointer;
@@ -82,11 +83,11 @@
 <body>
     <div class="container">
         <div class="logo-title">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BrainBite Logo" width="100px">
+            <img src="/static/images/logo.png" alt="BrainBite Logo" width="100px">
             <h1>BrainBite</h1>
         </div>
-        <h2>The search engine to feed you curiosity</h2>
-        <form action="{{ url_for('search_route') }}" method="get">
+        <h2>The search engine to feed your curiosity!</h2>
+        <form action="/search" method="get">
             <input type="text" name="q" placeholder="Search here..." required>
             <button type="submit">🔎</button>
         </form>
