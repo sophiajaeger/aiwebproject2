@@ -5,7 +5,7 @@
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Search Results</title> <!-- title displayed in the browser tab -->
-    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
+    <link rel="icon" type="image" href="{{ url_for('static', filename='images/favicon.png') }}">
     <style>
 
         #content {
@@ -65,7 +65,7 @@
             height: 100%;
             font-family: Arial, sans-serif;
             background-color: #20263F;
-            background: url('/static/images/background_results.jpg') no-repeat center center fixed;
+            background: url("{{ url_for('static', filename='images/background_results.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             background-blend-mode: darken;
             color: #121c25; /* Default text color*/
@@ -185,7 +185,7 @@
 <body>
     <div class="header" id="myHeader">
         <h2>
-            <img src="/static/images/favicon.png" alt="BrainBite Logo" style="width: 60px; height: 60px;">
+            <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="BrainBite Logo" style="width: 60px; height: 60px;">
             BrainBite
         </h2>
     </div>
@@ -197,7 +197,7 @@
             <div class="suggestions-box">
                 <p>Did you mean:</p>
                 {% for suggestion in suggestions %}
-                    <a href="/search?q={{ suggestion }}">{{ suggestion }}</a>{% if not loop.last %}, {% endif %}
+                <a href="{{ url_for('search_route', q=suggestion) }}">{{ suggestion }}</a>{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -222,7 +222,7 @@
     <div class = "footer">
         <h2>
             <!--link to go back to the search engine-->
-            <a href="/">Back to Search</a>
+            <a href="{{ url_for('home') }}">Back to Search</a>
         </h2>
     </div>
 </body>
