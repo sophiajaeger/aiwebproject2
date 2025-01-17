@@ -7,8 +7,8 @@ app = Flask(__name__) # create instance of Flask app
 @app.route('/') # define home route ("/")
 def home():
     # diplay a basic search form
-    return '''
-    <h1>Search Engine:</h1>
+    return render_template('home.html')
+    '''<h1>Search Engine:</h1>
     <form action="/search" method="get">
         <input type="text" name="q" placeholder="Search for words" required>
         <button type="submit">Search</button>
@@ -19,8 +19,8 @@ def home():
 def search_route():
     query = request.args.get('q')  # get search query from URL parameters
     if query:
-        results = search(query)  # pass to search function (crawler.py)
-        return render_template('results.html', results=results)  # pas results to HTML tamplate
+        results, suggestions = search(query)  # pass to search function (crawler.py)
+        return render_template('results.html', results=results, suggestions = suggestions)  # pas results to HTML tamplate
     return 'No query!'
 
 # run the app in debug mode if this file is executed directly
