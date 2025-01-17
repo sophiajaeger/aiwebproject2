@@ -1,7 +1,12 @@
 from flask import Flask, request, render_template
 from search import search # import search function from crawler.py 
+import traceback
 
 app = Flask(__name__) # create instance of Flask app
+
+@app.errorhandler(500)
+def internal_error(exception):
+    return "<pre>"+traceback.format_exc()+"</pre>"
 
 @app.route('/') # define home route ("/")
 def home():
