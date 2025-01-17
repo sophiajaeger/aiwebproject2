@@ -4,7 +4,8 @@
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Home</title>
-    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
+    <link rel="icon" type="image" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         .header {
             position: fixed;
@@ -17,7 +18,7 @@
         }
 
         body{
-            background: url('/static/images/background_home.jpg') no-repeat center center fixed; /* Source: https://unsplash.com/de/fotos/blaue-und-schwarze-abstrakte-malerei-prMn9KINLtI*/
+            background: url("{{ url_for('static', filename='images/background_results.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             color: white;
             font-family: Arial, sans-serif;
