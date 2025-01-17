@@ -11,11 +11,6 @@ sys.path.insert(1, '/home/u036/public_html/aiwebproject2')
 # Change the current working directory to the application's directory
 os.chdir('/home/u036/public_html/aiwebproject2')
 
-# Activate the virtual environment
-activate_this = '/home/u036/public_html/venv/bin/activate_this.py'
-with open(activate_this) as file_:
-    exec(file_.read(), dict(__file__=activate_this))
-
 # Import the Flask application
 from simple_app import app
 application = app
