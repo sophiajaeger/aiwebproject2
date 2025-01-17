@@ -5,7 +5,7 @@ from os.path import join, dirname, abspath
 
 
 # Import the Flask application
-from simple_app import app
+from app import app
 application = app
 
 # Error handler for internal server errors
