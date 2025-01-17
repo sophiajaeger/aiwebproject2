@@ -1,93 +1,159 @@
-# AIWebProject1
+# AIWebProject2
 
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.gwdg.de/aiweb24/aiwebproject1.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.gwdg.de/aiweb24/aiwebproject1/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
 ## Name
-Choose a self-explaining name for your project.
+BrainBite - The Search Engin To Feed Your Curiosity
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+BrainBite is a powerful and user-friendly search engine designed to crawl and index a website with interesting facts. It enables users to search and discover interesting information through an intuitive web interface.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Features
+- Independent Crawler: Crawls websites and indexes content efficiently.
+- Advanced Indexing: Uses the Whoosh library for structured data storage.
+- Intelligent Query Parsing: Supports multi-word search queries and ranks results by relevance.
+- Error Correction: Provides spelling suggestions for search queries.
+- Modern UI Design: Clean and responsive design with intuitive navigation (accessible search interface with Flask)
+- Teaser Display: Shows a teaser (first few sentences) of each result for better context.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Purpose
+The project was developed as part of the course "Artificial Intelligence and the Web" by Cognitive Science Students, to apply and internalise the implementation of core components of a search engine.
+
+### Data
+The search engine indexes real-world data sourced directly from https://interestingfacts.com/, a website rich in unique and engaging facts across various topics. The content includes fun facts, historical trivia, science insights, and more.
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Requirements
+- Python-Version: Python 3.9 or higher
+- Operating System: Windows, macOS, Linux
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Dependencies
+Install required package via requirements.txt:
+    ```
+    pip install -r requirements.txt
+    ```
+Dependencies:
+- Flask
+- Requests
+- BeautifulSoup4
+- Whoosh
+
+### Installation and Usage
+1. Repository cloning:
+    ```
+    git clone https://github.com/sophiajaeger/aiwebproject2.git
+    ```
+2. Create and activate virtual environment:
+    create a virtual enviroment:
+    ```
+        python -m venv myenv
+    ```
+
+    activate the enviroment:
+    ```
+        myenv\Scripts\activate  # Windows
+        source myenv/bin/activate  # macOS/Linux
+    ```
+3. Install the required dependencies:
+    ```
+        pip install -r requirements.txt
+    ```
+4. Run the Crawler
+    ```
+    python crawler.py
+    ```
+    This will crawl and index content from https://interestingfacts.com/
+5. Launch the Web Application
+    ```
+    python app.py
+    ```
+    Get access to the search engine.
+6. Search for Information
+- Enter a search query in the search bar
+- Explore the search results and suggested corrections
+
+## Deployment
+To deploy the project on a demo server:
+1. Upload project files to the server.
+2. Install dependencies with pip install -r requirements.txt.
+3. Run crawler.py to build the index.
+4. Start the Flask app with python app.py.
 
 ## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+For issues or inquiries, please contact:
+Email: 
+- cbehr@uni-osnabrueck.de
+- sjaeger@uni-osnabrueck.de
+- tgrell@uni-osnabrueck.de
+
+### Report Issues
+If you have a bug or have an idea for improvement, please report it in here in GitHub Issues: https://github.com/sophiajaeger/aiwebproject2/issues 
+When creating an issue, include:
+  - detailed description of the problem or suggestion
+  - Steps to reproduce the issue (if applicable)
+  - optional: Screenshots or error messages 
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Long-Term Goals could be
+- Semantic search: Semantic analysis to improve the search accurancy.
+- Available for Mobile: Enhance responsiveness for mobile devices.
+- Advanced Filters: Add filtering options by date, category, or relevance.
+
+### Open for new ideas
+We welcome for ideas and contributions!
+GitHub Issues https://github.com/sophiajaeger/aiwebproject2/issues
 
 ## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+If you would like to contribute your own ideas, you are welcome to improve and expand BrainBite! Just follow the guideline:
+1. Fork the repository
+    - click the "Fork" button at the top right side of this repository to copy
+2. Clone the Forked Repository
+    - command to clone locally: 
+    ```
+    git clone https://github.com/sophiajaeger/aiwebproject2.git
+    
+    ```
+3. Set up your enviroment
+    - install the required dependencies:
+    ```
+    pip install -r requirements.txt
+    ```
+    - set up a virtual environment: 
+    ```
+    python -m venv venv
+    source venv/bin/activate  # Linux/Mac
+    venv\Scripts\activate     # Windows
+    ```
+4. Create a new Branch for changes
+    ```
+    git checkout -b feature-branch-name
+    ```
+6. Dont forget to run Tests
+7. Commit and push your changes
+    - commit and stage your changes locally:
+    ```
+    git add .
+    git commit -m "a short but clear description of your changes"
+    ```
+    - push all to GitHub:
+    ```
+    git push
+    ```
+8. Submit a Pull Request for to propose changes to   the main project
+    - a bunner will appear in your repository indicating that your branch is one commit before octocat:main
+    - click Contribute and then Open a Pull Request
+    - click on Pull Request -> include a clear description of your changes
+9. Wait for an acceptance or questions about your Pull Request
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+A more detailed description can be found at the following link: https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Developed by:
+- Sophia Jaeger
+- Charlotte Behr
+- Tuyen Grell
 
-## License
-For open source projects, say how it is licensed.
+Lecturer of the course "Artificial Intelligence and the Web" (Universität Osnabrück): Dr. phil. Tobias Thelen 
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Done!
