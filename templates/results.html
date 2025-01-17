@@ -16,7 +16,7 @@
 
         .header {
             position: sticky;
-            justify-content: center; /* Center items horizontally */
+            justify-content: center; 
             display: flex; 
             overflow:hidden;
             top: 0;
@@ -38,7 +38,7 @@
             color: #4C5E64;
             background-color: white;
             width: 100%;
-            padding: 10px; /* Add some padding */
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -59,9 +59,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Center the main container vertically */
-            justify-content: center; /* Center the main container horizontally */
-            align-items: center; /* Center the main container vertically */
+            justify-content: center; 
+            justify-content: center; 
+            align-items: center; 
             min-height: 100vh;
             margin: 0;
             height: 100%;
@@ -70,10 +70,10 @@
             background: url("{{ url_for('static', filename='images/background_results.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             background-blend-mode: darken;
-            color: #121c25; /* Default text color*/
+            color: #121c25; 
         }
 
-        /* Main container styles */
+        /* main container styles */
         .container {
             background-color: rgba(255, 255, 255, 0.3); /* light blue for the middle part with 0.5 transparency*/
             width: 85%; /* Restrict the width to 80% of the screen */
@@ -83,35 +83,30 @@
             border-radius: 8px; /* Rounded corners */
             text-align: justify;
             flex: 1;
-            min-height: 50px; /* Minimum height to avoid squished look */
-            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /*shadow of middle part*/
+            min-height: 50px; /* minimum height to avoid squished look */
         }
 
-        /* Style the main heading */
         h1 {
-            font-size: 3rem; /* Large heading */
-            margin: 20px 0; /*spacing below the heading */
-            text-align: center; /* Align text to left side */
+            font-size: 3rem; 
+            margin: 20px 0; 
+            text-align: center; 
             color: white;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
         }
 
-        /* Style links */
         a {
-            font-size: 1.5rem; /* Increase link size */
+            font-size: 1.5rem; 
             color: #f7d8e0; 
-            text-decoration: none; /* Remove underline */
-            /* add some space above*/
+            text-decoration: none; 
             margin-top: 10px;
         }
 
         a:hover {
-            text-decoration: underline; /* Underline on hover */
+            text-decoration: underline; /* underline on hover */
         }
 
-        /* Style teaser text */
         p {
-            font-size: 1rem; /* Smaller than links */
+            font-size: 1rem; 
             color: #e2e2e2; 
             margin: 5px 0;
         }
@@ -134,50 +129,50 @@
         /* Suggestions box */
         .suggestions-container {
             display: flex;
-            justify-content: center; /* Center the suggestions box horizontally */
+            justify-content: center; /* center the suggestions box horizontally */
             width: 100%;
         }
         .suggestions-box {
             border: 1px solid #ccc;
             padding: 10px;
-            background-color: #dbeefe; /* Light blue background */
+            background-color: #dbeefe; 
             display: inline-block;
             width: 25%;
-            border-radius: 5px; /* Rounded corners */
+            border-radius: 5px; /* rounded corners */
 
         }
         .suggestions-box p {
-            background-color: #8ba4b9; /* Slightly darker blue */
+            background-color: #8ba4b9;
             padding: 10px;
             font-size: 1.25rem;
-            border-radius: 5px; /* Rounded corners */
-            color: black; /* Text color */
+            border-radius: 5px; /* rounded corners */
+            color: black; /* text color */
             text-align: center;
         }
         .suggestions-heading {
-            font-weight: bold; /* Make the heading bold */
+            font-weight: bold; 
             margin-top: 10px;
         }
         .suggestions-box a {
-            background-color: #f7e2e7; /* Yellow background */
+            background-color: #f7e2e7; 
             padding: 5px 10px;
             text-decoration: none;
             color: #4b273f; 
-            border: 1px solid #ccc; /* Add border */
-            border-radius: 5px; /* Rounded corners */
-            margin: 5px 0; /* Add some margin */
-            display: inline-block; /* Display links as block */
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            margin: 5px 0; 
+            display: inline-block;
         }
         .suggestions-box a:hover {
-            text-decoration: underline; /* Underline on hover */
+            text-decoration: underline; 
         }
 
         ul {
-            list-style-type: none; /* Remove bullet points */
-            padding: 10; /* Remove default padding */
+            list-style-type: none; /* remove bullet points */
+            padding: 10; /* remove default padding */
         }
 
-        /* Add space between results */
+        /* add space between results */
         li {
             margin-bottom: 25px;
         }

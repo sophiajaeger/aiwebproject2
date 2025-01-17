@@ -4,12 +4,13 @@
     <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
     <title>Home</title>
-    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
-
+    <link rel="icon" type="image" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
     <!-- css styles for the home page -->
     <style>
         body{
-            background: url('/static/images/background_home.jpg') no-repeat center center fixed; /* Source: https://unsplash.com/de/fotos/blaue-und-schwarze-abstrakte-malerei-prMn9KINLtI*/
+            background: url("{{ url_for('static', filename='images/background_results.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             color: white;
             font-family: Arial, sans-serif;
@@ -83,11 +84,11 @@
 <body>
     <div class="container">
         <div class="logo-title">
-            <img src="/static/images/logo.png" alt="BrainBite Logo" width="100px">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BrainBite Logo" width="100px">
             <h1>BrainBite</h1>
         </div>
         <h2>The search engine to feed your curiosity!</h2>
-        <form action="/search" method="get">
+        <form action="{{ url_for('search_route') }}" method="get">
             <input type="text" name="q" placeholder="Search here..." required>
             <button type="submit">🔎</button>
         </form>
