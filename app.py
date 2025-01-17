@@ -4,7 +4,7 @@ import traceback
 
 app = Flask(__name__) # create instance of Flask app
 
-@app.errorhandler(500)
+@app.errorhandler(500) #errorhandling from courseware
 def internal_error(exception):
     return "<pre>"+traceback.format_exc()+"</pre>"
 
@@ -18,7 +18,7 @@ def search_route():
     query = request.args.get('q')  # get search query from URL parameters
     if query:
         results, suggestions = search(query)  # pass to search function (crawler.py)
-        return render_template('results.html', results=results, suggestions = suggestions)  # pas results to HTML tamplate
+        return render_template('results.html', results=results, suggestions = suggestions)  # pass results to HTML template
     return 'No query!'
 
 # run the app in debug mode if this file is executed directly
