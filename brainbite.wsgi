@@ -17,7 +17,7 @@ with open(activate_this) as file_:
     exec(file_.read(), dict(__file__=activate_this))
 
 # Import the Flask application
-from app import app
+from simple_app import app
 application = app
 
 # Error handler for internal server errors
