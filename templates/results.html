@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Metadata for the webside-->
+    <meta charset="UTF-8"> <!-- specifies the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--formate for different screen sizes-->
+    <title>Search Results</title> <!-- title displayed in the browser tab -->
+    <link rel="icon" type="image" href="/static/images/favicon.png"> <!-- icon displayed in the browser tab -->
+    <style>
+
+        #content {
+            overflow-y: scroll;
+        }
+
+        .header {
+            position: sticky;
+            justify-content: center; /* Center items horizontally */
+            display: flex; 
+            overflow:hidden;
+            top: 0;
+            height: 6vh;
+            margin: 0px;
+            color: #4C5E64;
+            background-color: white;
+            width: 100%;
+            padding: 10px; 
+            align-items: center;
+        }
+
+        .footer {
+            position: sticky;
+            overflow:hidden;
+            bottom: 0;
+            height: 4vh;
+            margin: 0px;
+            color: #4C5E64;
+            background-color: white;
+            width: 100%;
+            padding: 10px; /* Add some padding */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        .header h2{
+            font-size: 2rem;
+            margin: 0;
+            padding-left: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center the main container vertically */
+            justify-content: center; /* Center the main container horizontally */
+            align-items: center; /* Center the main container vertically */
+            min-height: 100vh;
+            margin: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #20263F;
+            background: url('/static/images/background_results.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-blend-mode: darken;
+            color: #121c25; /* Default text color*/
+        }
+
+        /* Main container styles */
+        .container {
+            background-color: rgba(255, 255, 255, 0.3); /* light blue for the middle part with 0.5 transparency*/
+            width: 85%; /* Restrict the width to 80% of the screen */
+            margin: 0 auto; /* Center the container horizontally */
+            max-width: 1200px; /* Limit the width for large screens */
+            padding: 20px; /* Add padding inside the container */
+            border-radius: 8px; /* Rounded corners */
+            text-align: justify;
+            flex: 1;
+            min-height: 50px; /* Minimum height to avoid squished look */
+            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /*shadow of middle part*/
+        }
+
+        /* Style the main heading */
+        h1 {
+            font-size: 3rem; /* Large heading */
+            margin: 20px 0; /*spacing below the heading */
+            text-align: center; /* Align text to left side */
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Style links */
+        a {
+            font-size: 1.5rem; /* Increase link size */
+            color: #f7d8e0; 
+            text-decoration: none; /* Remove underline */
+            /* add some space above*/
+            margin-top: 10px;
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        /* Style teaser text */
+        p {
+            font-size: 1rem; /* Smaller than links */
+            color: #e2e2e2; 
+            margin: 5px 0;
+        }
+
+        /* Style the "Back to Search" link */
+        .footer a[href="/"] {
+            font-size: 1.2rem;
+            color: #4C5E64;
+            display: inline-block; /* Ensure margin works properly */
+            text-align: center;
+            margin-bottom: 10;
+            margin-left: 10;
+            padding-bottom: 10px;
+        }
+
+        .footer a[href="/"]:hover {
+            text-decoration: underline; /*underline when hovering over the link*/
+        }
+
+        /* Suggestions box */
+        .suggestions-container {
+            display: flex;
+            justify-content: center; /* Center the suggestions box horizontally */
+            width: 100%;
+        }
+        .suggestions-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #dbeefe; /* Light blue background */
+            display: inline-block;
+            width: 25%;
+            border-radius: 5px; /* Rounded corners */
+
+        }
+        .suggestions-box p {
+            background-color: #8ba4b9; /* Slightly darker blue */
+            padding: 10px;
+            font-size: 1.25rem;
+            border-radius: 5px; /* Rounded corners */
+            color: black; /* Text color */
+            text-align: center;
+        }
+        .suggestions-heading {
+            font-weight: bold; /* Make the heading bold */
+            margin-top: 10px;
+        }
+        .suggestions-box a {
+            background-color: #f7e2e7; /* Yellow background */
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #4b273f; 
+            border: 1px solid #ccc; /* Add border */
+            border-radius: 5px; /* Rounded corners */
+            margin: 5px 0; /* Add some margin */
+            display: inline-block; /* Display links as block */
+        }
+        .suggestions-box a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 10; /* Remove default padding */
+        }
+
+        /* Add space between results */
+        li {
+            margin-bottom: 25px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header" id="myHeader">
+        <h2>
+            <img src="/static/images/favicon.png" alt="BrainBite Logo" style="width: 60px; height: 60px;">
+            BrainBite
+        </h2>
+    </div>
+    <div class="container">
+        <!-- main content(all you can see): -->
+        <h1>Search Results</h1> <!-- heading for the results page -->
+        {% if suggestions%}
+        <div class="suggestions-container">
+            <div class="suggestions-box">
+                <p>Did you mean:</p>
+                {% for suggestion in suggestions %}
+                    <a href="/search?q={{ suggestion }}">{{ suggestion }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {%endif%}
+        {% if results %}
+            <ul>
+            <!-- iterate over each result in the results list -->
+            {% for result in results %}
+                <li>
+                    <!-- link to the found URL + opens in a new tab -->
+                    <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+                    <!-- display the teaser -->
+                    <p>{{ result.teaser }}</p>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <!--if not found display:-->
+            <p>No results found.</p>
+        {% endif %}
+    </div>
+    <div class = "footer">
+        <h2>
+            <!--link to go back to the search engine-->
+            <a href="/">Back to Search</a>
+        </h2>
+    </div>
+</body>
+</html>
