@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: url("{{ url_for('static', filename='images/background_results.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+        background-blend-mode: darken;
+        color: #121c25;
+    }
+
+    .container {
+        background-color: rgba(255, 255, 255, 0.3);
+        width: 85%;
+        max-width: 1200px;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: justify;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 3rem;
+        margin: 20px 0;
+        text-align: center;
+        color: white;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        margin-bottom: 25px;
+    }
+
+    a {
+        font-size: 1.5rem;
+        color: #f7d8e0;
+        text-decoration: none;
+        margin-top: 10px;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #e2e2e2;
+        margin: 5px 0;
+    }
+
+    .bookmark-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        color: #7e959b;
+        font-size: 1rem;
+    }
+
+    .bookmark-button img {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+</style>
+<h1>Search Results</h1>
+{% if suggestions %}
+    <div class="suggestions-container">
+        <div class="suggestions-box">
+            <p>Did you mean:</p>
+            {% for suggestion in suggestions %}
+                <a href="{{ url_for('search_route', q=suggestion) }}">{{ suggestion }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+{% if results %}
+    <ul>
+    {% for result in results %}
+        <li>
+            <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+            <p>{{ result.teaser }}</p>
+            <button class="bookmark-button" onclick="bookmarkResult('{{ result.url }}', '{{ result.title }}', 'demo', this)">
+                <img src="{{ url_for('static', filename='images/bookmark.png') }}" alt="Bookmark Icon"> Bookmark
+            </button>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+{% endblock %}
